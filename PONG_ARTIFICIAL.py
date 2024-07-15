@@ -1,8 +1,3 @@
-# BUGS: A bola fica presa nas laterais (ARRUMAR COM URGÊNCIA)
-#
-#
-
-
 import pygame
 from pygame.locals import *
 from sys import exit
@@ -36,8 +31,6 @@ BLACK = (0, 0, 0)
 generation = 0
 population = 0
 tick = 200
-
-
 
 
 class Player:
@@ -98,27 +91,27 @@ class Ball:
         self.angle = random.uniform(0, 2 * math.pi)  # Ângulo inicial da bola
         self.speed = ball_speed
 
-        while self.speed * math.cos(self.angle) > - 0.5 and self.speed * math.cos(self.angle) < 0.5:
+        while -0.5 < self.speed * math.cos(self.angle) < 0.5:
             self.angle = random.uniform(0.1, 2 * math.pi)
 
     def change_move_y(self):
         # Rebate a Bola se bater na Lateral
         self.angle = -self.angle
 
-
     def change_move_x(self):
         # Rebate a Bola se bater no Jogador e altera o ângulo
         self.angle = math.pi - self.angle + random.uniform(-0.1 * math.pi, 0.1 * math.pi)
-
-        while self.speed * math.cos(self.angle) > -0.5 and self.speed * math.cos(self.angle) < 0.5:
+        while -0.5 < self.speed * math.cos(self.angle) < 0.5:
             self.angle = random.uniform(0.1, 2 * math.pi)
-
 
     def move(self):
         # Move a Bola pela Arena e Verifica sua colisão com as bordas
-        if self.rect.bottom >= SCREEN_HEIGHT - start_line or self.rect.top <= start_line:
+        if self.rect.bottom >= SCREEN_HEIGHT - start_line:
+            self.rect.bottom = SCREEN_HEIGHT - start_line
             self.change_move_y()
-
+        elif self.rect.top <= start_line:
+            self.rect.top = start_line
+            self.change_move_y()
 
         self.rect.x += self.speed * math.cos(self.angle)
         self.rect.y += self.speed * math.sin(self.angle)
@@ -126,10 +119,10 @@ class Ball:
         # Certifique-se de que a bola não fique presa nas bordas
         if self.rect.left <= start_line:
             self.rect.left = start_line
-
-        if self.rect.right >= SCREEN_WIDTH - start_line:
+            self.angle = math.pi - self.angle
+        elif self.rect.right >= SCREEN_WIDTH - start_line:
             self.rect.right = SCREEN_WIDTH - start_line
-
+            self.angle = math.pi - self.angle
 
     def collide(self, player):
         # Verifica se a Bola bateu no jogador
@@ -138,7 +131,7 @@ class Ball:
     def draw(self, SCREEN):
         # Desenha a Bola
         pygame.draw.circle(SCREEN, self.color, self.rect.center, self.width // 2)
-        pygame.draw.circle(SCREEN, WHITE, self.rect.center, self.width // 2, 1)
+        pygame.draw.circle(SCREEN, (255, 255, 255), self.rect.center, self.width // 2, 1)
 
 
 def direction_ball_x():
@@ -291,11 +284,8 @@ def eval_genomes(genomes, config):
         for player_t, ball in zip(player_two, balls):
             player_t.move_ia(ball)
 
-
         if len(balls) <= 0 or ge[balls.index(ball)].fitness > FITNESS:
             break
-
-
 
         draw_map()
         pygame.display.update()
