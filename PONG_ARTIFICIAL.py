@@ -220,7 +220,8 @@ def eval_genomes(genomes, config):
     while run:
         clock.tick(tick)
         SCREEN.fill(color)
-
+        
+        # Sair do Jogo e Aumento de Velocidade
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -248,6 +249,7 @@ def eval_genomes(genomes, config):
 
         # Código para lidar com a colisão com os jogadores
         for ball in balls:
+            # Colisão com Jogadores
             if ball.collide(player_one[balls.index(ball)]) or ball.collide(player_two[balls.index(ball)]):
                 if ball.collide(player_one[balls.index(ball)]):
                     ge[balls.index(ball)].fitness += 1000
@@ -259,7 +261,7 @@ def eval_genomes(genomes, config):
                     ball.rect.right = player_two[balls.index(ball)].rect.left - 1
 
 
-
+            # Eliminar jogador caso a bola passe dele
             elif ball.rect.left <= start_line or ball.rect.right >= SCREEN_WIDTH - start_line:
                 ge[balls.index(ball)].fitness -= 2000
                 idx = balls.index(ball)
@@ -270,6 +272,7 @@ def eval_genomes(genomes, config):
                 ge.pop(idx)
                 population -= 1
 
+        # Rede neural Da IA e criação do seu movimento
         for i, move_player_1 in enumerate(player_one):
             move_player_1.move()
             output = nets[i].activate((move_player_1.rect.centery,
@@ -284,13 +287,15 @@ def eval_genomes(genomes, config):
         for player_t, ball in zip(player_two, balls):
             player_t.move_ia(ball)
 
+        # Reiniciar jogo se bola o número de bolas for 0
         if len(balls) <= 0 or ge[balls.index(ball)].fitness > FITNESS:
             break
 
+        # Desenhar o mapa e atualizar cenário constantemente
         draw_map()
         pygame.display.update()
 
-
+# Rodar Jogo e Redes Neurais
 def run(config_file):
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, config_file)
